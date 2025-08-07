@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirTravel Pro | Flight Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 5%;
+        }
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 5%;
+            text-align: center;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin: 10px;
+            transition: all 0.3s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .flight-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .flight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        #flightResults {
+            display: none;
+            padding: 80px 5%;
+        }
+        .airline-logo {
+            height: 40px;
+            max-width: 100px;
+            object-fit: contain;
+        }
+        .price-badge {
+            background-color: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        .gcash-btn {
+            background-color: #0033A0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media (max-width: 768px) {
+            .hero {
+                padding: 80px 5%;
+                min-height: 60vh;
+            }
+            .search-box {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold fs-3" href="#" style="color: var(--primary);">
+                <i class="fas fa-plane me-2"></i>AirTravel Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#flights">Flights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="fas fa-user me-1"></i>Login
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Your Journey Begins Here</h1>
+            <p class="lead mb-5">Book flights with the best prices and instant confirmation</p>
+            
+            <div class="search-box mx-auto" style="max-width: 1000px;">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">From</label>
+                        <select class="form-select form-select-lg" id="fromCity">
+                            <option selected disabled>Select city</option>
+                            <option value="MNL">Manila (MNL)</option>
+                            <option value="CEB">Cebu (CEB)</option>
+                            <option value="DVO">Davao (DVO)</option>
+                            <option value="ILO">Iloilo (ILO)</option>
+                            <option value="PPS">Puerto Princesa (PPS)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">To</label>
+                        <select class="form-select form-select-lg" id="toCity">
+                            <option selected disabled>Select city</option>
+                            <option value="MNL">Manila (MNL)</option>
+                            <option value="CEB">Cebu (CEB)</option>
+                            <option value="DVO">Davao (DVO)</option>
+                            <option value="ILO">Iloilo (ILO)</option>
+                            <option value="PPS">Puerto Princesa (PPS)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-medium">Departure</label>
+                        <input type="date" class="form-control form-control-lg" id="departureDate">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-medium">Passengers</label>
+                        <select class="form-select form-select-lg" id="passengers">
+                            <option value="1">1 Adult</option>
+                            <option value="2">2 Adults</option>
+                            <option value="3">3 Adults</option>
+                            <option value="4">4 Adults</option>
+                            <option value="5">5+ Adults</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary btn-lg w-100 py-3" id="searchFlights">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="container my-5 py-5" id="features">
+        <h2 class="text-center fw-bold mb-5">Why Choose AirTravel Pro?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-tag fa-2x"></i>
+                    </div>
+                    <h3 class="h4">Best Price Guarantee</h3>
+                    <p class="mb-0">We compare prices across all airlines to ensure you get the best deal with our competitive rates and low service fees.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-bolt fa-2x"></i>
+                    </div>
+                    <h3 class="h4">Instant E-Ticket</h3>
+                    <p class="mb-0">Receive your electronic ticket immediately after payment confirmation via email or SMS.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-wallet fa-2x"></i>
+                    </div>
+                    <h3 class="h4">GCash Payments</h3>
+                    <p class="mb-0">Secure and convenient payments processed directly through GCash with instant confirmation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flight Results Section -->
+    <section class="bg-light" id="flightResults">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Available Flights</h2>
+            <div id="flightList" class="mb-5"></div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login to Your Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" placeholder="your@email.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" placeholder="••••••••">
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox">
+                                <label class="form-check-label">Remember me</label>
+                            </div>
+                            <a href="#" class="text-primary small">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Don't have an account? <a href="#" class="text-primary">Sign up</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Complete Your Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Flight Details</h6>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <div>
+                                            <h5 id="modalAirline" class="mb-1">Philippine Airlines</h5>
+                                            <small class="text-muted" id="modalRoute">MNL → CEB</small>
+                                        </div>
+                                        <img id="modalAirlineLogo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Philippine_Airlines_logo.svg/1200px-Philippine_Airlines_logo.svg.png" class="airline-logo">
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <div class="fw-bold" id="modalDeparture">Aug 15, 08:00</div>
+                                            <small class="text-muted">Departure</small>
+                                        </div>
+                                        <div class="text-center">
+                                            <i class="fas fa-plane text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-end" id="modalArrival">Aug 15, 09:30</div>
+                                            <small class="text-muted text-end d-block">Arrival</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h6 class="fw-bold mb-3">Passenger Information</h6>
+                            <form id="bookingForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mobile Number</label>
+                                    <input type="tel" class="form-control" required>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Payment Summary</h6>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Base Fare</span>
+                                        <span id="modalBasePrice">₱2,500</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Service Fee</span>
+                                        <span id="modalServiceFee">₱250</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <span>Total</span>
+                                        <span id="modalTotalPrice">₱2,750</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h6 class="fw-bold mb-3">Payment Method</h6>
+                            <div class="mb-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="gcashPayment" checked>
+                                    <label class="form-check-label d-flex align-items-center" for="gcashPayment">
+                                        <img src="https://www.gcash.com/resources/img/gcash-logo.png" style="height: 20px; margin-right: 10px;">
+                                        GCash
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cardPayment">
+                                    <label class="form-check-label d-flex align-items-center" for="cardPayment">
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Credit/Debit Card
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                After booking, you'll receive payment instructions via email/SMS
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmBooking">
+                        <i class="fas fa-check me-2"></i>Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="text-success mb-4">
+                        <i class="fas fa-check-circle fa-5x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Booking Confirmed!</h3>
+                    <p class="mb-4">Your flight has been successfully booked. Payment instructions have been sent to your email.</p>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-plane me-2"></i>AirTravel Pro
+                    </h5>
+                    <p>Your trusted partner for affordable and convenient flight bookings in the Philippines.</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">About Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Careers</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Support</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Help Center</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold mb-3">Newsletter</h6>
+                    <p class="text-white-50">Subscribe for exclusive deals and travel tips.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Your email">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="mb-3 mb-md-0">
+                    <small class="text-white-50">© 2023 AirTravel Pro. All rights reserved.</small>
+                </div>
+                <div>
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white-50 me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white-50"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample flight data with 10% profit added
+        const flights = [
+            { 
+                id: 1, 
+                airline: "Philippine Airlines", 
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Philippine_Airlines_logo.svg/1200px-Philippine_Airlines_logo.svg.png", 
+                from: "MNL", 
+                fromCity: "Manila", 
+                to: "CEB", 
+                toCity: "Cebu", 
+                departure: "2023-08-15 08:00", 
+                arrival: "2023-08-15 09:30", 
+                duration: "1h 30m", 
+                price: 2500,
+                baggage: "20kg"
+            },
+            { 
+                id: 2, 
+                airline: "Cebu Pacific", 
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Cebu_Pacific_logo_2019.svg/1200px-Cebu_Pacific_logo_2019.svg.png", 
+                from: "MNL", 
+                fromCity: "Manila", 
+                to: "CEB", 
+                toCity: "Cebu", 
+                departure: "2023-08-15 12:00", 
+                arrival: "2023-08-15 13:20", 
+                duration: "1h 20m", 
+                price: 1800,
+                baggage: "15kg"
+            },
+            { 
+                id: 3, 
+                airline: "AirAsia", 
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/AirAsia_New_Logo.svg/1200px-AirAsia_New_Logo.svg.png", 
+                from: "MNL", 
+                fromCity: "Manila", 
+                to: "CEB", 
+                toCity: "Cebu", 
+                departure: "2023-08-15 15:30", 
+                arrival: "2023-08-15 16:50", 
+                duration: "1h 20m", 
+                price: 2000,
+                baggage: "10kg"
+            },
+            { 
+                id: 4, 
+                airline: "Philippine Airlines", 
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Philippine_Airlines_logo.svg/1200px-Philippine_Airlines_logo.svg.png", 
+                from: "CEB", 
+                fromCity: "Cebu", 
+                to: "MNL", 
+                toCity: "Manila", 
+                departure: "2023-08-16 10:00", 
+                arrival: "2023-08-16 11:30", 
+                duration: "1h 30m", 
+                price: 2600,
+                baggage: "20kg"
+            },
+            { 
+                id: 5, 
+                airline: "Cebu Pacific", 
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Cebu_Pacific_logo_2019.svg/1200px-Cebu_Pacific_logo_2019.svg.png", 
+                from: "DVO", 
+                fromCity: "Davao", 
+                to: "MNL", 
+                toCity: "Manila", 
+                departure: "2023-08-17 14:00", 
+                arrival: "2023-08-17 16:15", 
+                duration: "2h 15m", 
+                price: 2200,
+                baggage: "15kg"
+            }
+        ];
+
+        // Add 10% profit to each flight
+        flights.forEach(flight => {
+            flight.finalPrice = Math.round(flight.price * 1.10);
+            flight.serviceFee = flight.finalPrice - flight.price;
+            flight.seatsLeft = Math.floor(Math.random() * 10) + 1;
+        });
+
+        // DOM Elements
+        const fromCitySelect = document.getElementById('fromCity');
+        const toCitySelect = document.getElementById('toCity');
+        const departureDateInput = document.getElementById('departureDate');
+        const passengersSelect = document.getElementById('passengers');
+        const searchFlightsBtn = document.getElementById('searchFlights');
+        const flightList = document.getElementById('flightList');
+        const flightResults = document.getElementById('flightResults');
+        const confirmBookingBtn = document.getElementById('confirmBooking');
+        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+
+        // Set default departure date to tomorrow
+        function setDefaultDate() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            const formattedDate = tomorrow.toISOString().split('T')[0];
+            departureDateInput.value = formattedDate;
+            departureDateInput.min = formattedDate;
+        }
+
+        // Display flights in the UI
+        function displayFlights(filteredFlights) {
+            flightList.innerHTML = '';
+            
+            if (filteredFlights.length === 0) {
+                flightList.innerHTML = `
+                    <div class="alert alert-info text-center py-4">
+                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                        <h4 class="alert-heading">No flights found</h4>
+                        <p>Try adjusting your search criteria or dates</p>
+                    </div>
+                `;
+                flightResults.style.display = 'block';
+                return;
+            }
+            
+            filteredFlights.forEach(flight => {
+                const flightCard = document.createElement('div');
+                flightCard.className = 'flight-card';
+                flightCard.innerHTML = `
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            <img src="${flight.logo}" alt="${flight.airline}" class="airline-logo mb-2 mb-md-0">
+                        </div>
+                        <div class="col-md-3">
+                            <h5 class="mb-1">${flight.airline}</h5>
+                            <small class="text-muted">${flight.fromCity} (${flight.from}) → ${flight.toCity} (${flight.to})</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <div class="fw-bold">${formatTime(flight.departure)}</div>
+                                    <small class="text-muted">${formatDate(flight.departure)}</small>
+                                </div>
+                                <div class="text-center mx-2">
+                                    <div class="text-muted small">${flight.duration}</div>
+                                    <div class="border-top my-1"></div>
+                                    <small class="text-muted">${flight.baggage}</small>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">${formatTime(flight.arrival)}</div>
+                                    <small class="text-muted">${formatDate(flight.arrival)}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="badge bg-success">${flight.seatsLeft} seats left</span>
+                        </div>
+                        <div class="col-md-2 text-md-end mt-3 mt-md-0">
+                            <div class="h4 mb-1">₱${flight.finalPrice.toLocaleString()}</div>
+                            <small class="text-muted d-block mb-2">Base fare: ₱${flight.price.toLocaleString()}</small>
+                            <button class="btn btn-primary book-btn" data-id="${flight.id}">
+                                <i class="fas fa-ticket-alt me-1"></i>Book Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+                flightList.appendChild(flightCard);
+            });
+            
+            // Add event listeners to book buttons
+            document.querySelectorAll('.book-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const flightId = parseInt(this.getAttribute('data-id'));
+                    const flight = flights.find(f => f.id === flightId);
+                    openBookingModal(flight);
+                });
+            });
+            
+            flightResults.style.display = 'block';
+            flightResults.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Format time (08:00)
+        function formatTime(dateTimeStr) {
+            const timePart = dateTimeStr.split(' ')[1];
+            return timePart.substring(0, 5);
+        }
+
+        // Format date (Aug 15)
+        function formatDate(dateTimeStr) {
+            const datePart = dateTimeStr.split(' ')[0];
+            const date = new Date(datePart);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // Open booking modal with flight details
+        function openBookingModal(flight) {
+            document.getElementById('modalAirline').textContent = flight.airline;
+            document.getElementById('modalAirlineLogo').src = flight.logo;
+            document.getElementById('modalRoute').textContent = `${flight.fromCity} (${flight.from}) → ${flight.toCity} (${flight.to})`;
+            document.getElementById('modalDeparture').textContent = `${formatDate(flight.departure)}, ${formatTime(flight.departure)}`;
+            document.getElementById('modalArrival').textContent = `${formatDate(flight.arrival)}, ${formatTime(flight.arrival)}`;
+            document.getElementById('modalBasePrice').textContent = `₱${flight.price.toLocaleString()}`;
+            document.getElementById('modalServiceFee').textContent = `₱${flight.serviceFee.toLocaleString()}`;
+            document.getElementById('modalTotalPrice').textContent = `₱${flight.finalPrice.toLocaleString()}`;
+            
+            bookingModal.show();
+        }
+
+        // Search flights
+        function searchFlights() {
+            const fromCity = fromCitySelect.value;
+            const toCity = toCitySelect.value;
+            const departureDate = departureDateInput.value;
+            
+            if (!fromCity || !toCity || !departureDate) {
+                alert('Please fill all search fields');
+                return;
+            }
+            
+            if (fromCity === toCity) {
+                alert('Origin and destination cannot be the same');
+                return;
+            }
+            
+            // Filter flights (in a real app, this would be an API call)
+            const filteredFlights = flights.filter(flight => 
+                flight.from === fromCity && 
+                flight.to === toCity && 
+                flight.departure.startsWith(departureDate)
+                .sort((a, b) => a.finalPrice - b.finalPrice);
+            
+            displayFlights(filteredFlights);
+        }
+
+        // Event Listeners
+        searchFlightsBtn.addEventListener('click', searchFlights);
+        
+        confirmBookingBtn.addEventListener('click', function() {
+            // In a real app, this would process the payment
+            bookingModal.hide();
+            setTimeout(() => successModal.show(), 300);
+        });
+
+        // Initialize
+        setDefaultDate();
+    </script>
+</body>
+</html>
